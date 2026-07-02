@@ -1,0 +1,1 @@
+# [CI] main 푸시 시 aws s3 sync + cloudfront create-invalidation
