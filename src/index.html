@@ -1,1 +1,58 @@
-<!-- [화면] 메인 페이지 — 날짜 탭 / 팀 필터 / 경기 카드 영역 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>월드컵 실시간 일정 &amp; 결과</title>
+<link rel="stylesheet" href="./css/style.css">
+<script>
+  // 깜빡임 방지: CSS 로드 전에 저장된 테마를 먼저 적용
+  (function(){
+    var saved = localStorage.getItem("wc-theme");
+    if (saved === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  })();
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-group">
+        <img src="./assets/logo-dark.png" class="logo logo-for-dark" alt="월드컵 라이브 로고">
+        <img src="./assets/logo-light.png" class="logo logo-for-light" alt="월드컵 라이브 로고">
+        <div>
+          <div class="brand">WORLD<span>CUP</span> LIVE</div>
+          <div class="brand-sub">MATCH SCHEDULE &amp; RESULTS</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙 다크</button>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </header>
+
+    <div class="date-tabs" id="dateTabs" role="tablist"></div>
+
+    <div class="filter-row">
+      <span class="filter-label">팀 필터</span>
+      <select id="teamFilter"></select>
+      <button class="clear-filter" id="clearFilter">필터 초기화</button>
+    </div>
+
+    <div id="matchList"></div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-panel">
+      <button class="modal-close" id="modalClose" aria-label="닫기">✕</button>
+      <div id="modalPanel"></div>
+    </div>
+  </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/render.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>
