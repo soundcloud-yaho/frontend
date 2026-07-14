@@ -8,9 +8,9 @@ const STATUS_LABEL = {
   finished: "종료",
 };
 
-function flagUrl(code) {
-  // ISO 3166-1 alpha-2 코드 기준. flagcdn.com 무료 CDN 사용.
-  return `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+function crestImg(team) {
+  const src = team.crest_url || "";
+  return `<img src="${src}" alt="${team.name} 엠블럼" loading="lazy" onerror="this.style.visibility='hidden'">`;
 }
 
 function formatDateLabel(dateStr) {
@@ -64,14 +64,12 @@ function matchCardHTML(m) {
     <div class="match-card${clickable ? " clickable" : ""}" data-id="${m.id}">
       <div class="teams">
         <div class="team home">
-          <img src="${flagUrl(home.code.split('-')[0])}" alt="${home.name} 국기" loading="lazy"
-               onerror="this.style.visibility='hidden'">
+          ${crestImg(home)}
           <span class="team-name">${home.name}</span>
         </div>
         <div class="score-box">${scoreHTML}</div>
         <div class="team away">
-          <img src="${flagUrl(away.code.split('-')[0])}" alt="${away.name} 국기" loading="lazy"
-               onerror="this.style.visibility='hidden'">
+          ${crestImg(away)}
           <span class="team-name">${away.name}</span>
         </div>
       </div>
@@ -156,7 +154,7 @@ function matchDetailHTML(m) {
 
   let statsHTML;
   if (!m.stats) {
-    statsHTML = `<div class="no-stats">경기 시작 전에는 스탯을 제공하지 않습니다</div>`;
+    statsHTML = `<div class="no-stats">스탯 정보가 제공되지 않는 경기입니다</div>`;
   } else {
     const s = m.stats;
     statsHTML = `
@@ -171,7 +169,7 @@ function matchDetailHTML(m) {
   return `
     <div class="modal-header">
       <div class="modal-team">
-        <img src="${flagUrl(home.code.split('-')[0])}" alt="${home.name}">
+        ${crestImg(home)}
         <span>${home.name}</span>
       </div>
       <div class="modal-score">
@@ -179,7 +177,7 @@ function matchDetailHTML(m) {
         <div class="modal-score-num">${scoreHTML}</div>
       </div>
       <div class="modal-team away">
-        <img src="${flagUrl(away.code.split('-')[0])}" alt="${away.name}">
+        ${crestImg(away)}
         <span>${away.name}</span>
       </div>
     </div>
