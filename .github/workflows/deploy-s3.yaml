@@ -1,41 +1,42 @@
-# [CI] master 푸시 시 aws s3 sync + cloudfront create-invalidation
-
-name: Deploy to S3 and CloudFront
-
+name: Deploy Frontend to S3 + CloudFront
 on:
   push:
     branches:
       - master
     paths:
-      - "src/**"                          # 프론트엔드(src) 폴더가 바뀔 때만 실행
-      - ".github/workflows/deploy-s3.yaml"
-
+      - "src/**"          # 프론트엔드(src) 폴더가 바뀔 때만 실행
+      - ".github/workflows/deploy.yml"
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. 저장소 코드 내려받기
-      - name: Checkout repository
+      - name: 저장소 코드 가져오기
         uses: actions/checkout@v4
-
-      # 2. AWS 인증 정보 설정
-      - name: Configure AWS credentials
+      - name: AWS 자격 증명 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
-      # 3. src 폴더(프론트엔드)만 S3 버킷 루트로 동기화
-      #    backend/, .venv 등 다른 폴더는 대상이 아니므로 자동으로 제외됨
-      #    --delete: S3에 있는데 로컬(src)엔 없는 파일은 삭제 (완전 동기화)
-      - name: Sync frontend files to S3
+          aws-region: ${{ secrets.AWS_REGION }}
+      # 배포 직전에 실제 백엔드 주소로 config.js를 덮어씁니다.
+      # (로컬 config.js에는 127.0.0.1 등 개발용 값이 들어있을 수 있으므로,
+      #  배포본에는 PROD_BASE_URL이 실제 서비스 값으로 확실히 반영되게 합니다)
+      - name: 배포용 config.js 생성
+        run: |
+          cat > src/js/config.js << 'EOF'
+          const LOCAL_BASE_URL = "http://127.0.0.1:8000";
+          const PROD_BASE_URL = "${{ secrets.BACKEND_API_URL }}";
+          const CONFIG = {
+            BASE_URL:
+              location.hostname === "localhost" || location.hostname === "127.0.0.1"
+                ? LOCAL_BASE_URL
+                : PROD_BASE_URL,
+          };
+          EOF
+      - name: S3에 업로드 (src 폴더 내용을 버킷 루트로)
         run: |
           aws s3 sync src/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
-
-      # 4. CloudFront 캐시 무효화
-      - name: Invalidate CloudFront cache
+      - name: CloudFront 캐시 무효화
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
