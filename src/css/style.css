@@ -289,11 +289,9 @@ header{
 }
 .team.away{ flex-direction: row-reverse; text-align:right; }
 .team img{
-  width: 30px;
-  height: 22px;
-  object-fit: cover;
-  border-radius: 3px;
-  box-shadow: 0 0 0 1px rgba(245,245,240,0.15);
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
   flex-shrink:0;
 }
 .team-name{
@@ -427,10 +425,8 @@ header{
 }
 .modal-team img{
   width: 40px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 4px;
-  box-shadow: 0 0 0 1px rgba(245,245,240,0.15);
+  height: 40px;
+  object-fit: contain;
 }
 .modal-team span{
   font-family:'Oswald', sans-serif;
