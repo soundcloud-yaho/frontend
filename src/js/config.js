@@ -15,5 +15,5 @@ const CONFIG = {
   BASE_URL:
     location.hostname === "localhost" || location.hostname === "127.0.0.1"
       ? LOCAL_BASE_URL
-      : PROD_BASE_URL,
+      : PROD_BASE_URL, 
 };
