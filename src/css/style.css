@@ -487,3 +487,132 @@ header{
 }
 .stat-bar-home{ background: var(--amber); }
 .stat-bar-away{ background: var(--gray); }
+/* ------------------------------------------------------------
+   즐겨찾기 별, 로그인 영역 (기존 style.css 맨 아래에 추가)
+------------------------------------------------------------ */
+.fav-star{
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--gray);
+  margin: 0 4px;
+  user-select: none;
+  transition: transform 0.1s ease;
+}
+.fav-star:hover{ transform: scale(1.15); }
+.fav-star.active{ color: var(--amber); }
+
+.auth-nickname{
+  font-family:'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--gray);
+  margin-right: 4px;
+}
+
+/* 승부예측 */
+.prediction-box{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 4px;
+}
+.prediction-title{
+  font-family:'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.prediction-buttons{
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pred-btn{
+  flex: 1;
+  background: rgba(245,245,240,0.04);
+  border: 1px solid var(--line);
+  color: var(--chalk);
+  border-radius: 8px;
+  padding: 10px 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.pred-btn:hover{ border-color: rgba(245,245,240,0.3); }
+.pred-btn.active{
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--night);
+  font-weight: 600;
+}
+.prediction-summary{
+  font-family:'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--gray);
+  text-align: center;
+}
+
+/* 댓글 */
+.comment-box{
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+}
+.comment-form{
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.comment-form input{
+  flex: 1;
+  background: rgba(245,245,240,0.04);
+  border: 1px solid var(--line);
+  color: var(--chalk);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+}
+.comment-form button{
+  padding: 8px 16px;
+  font-size: 13px;
+}
+.comment-list{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.comment-item{
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.comment-item:last-child{ border-bottom: none; padding-bottom: 0; }
+.comment-meta{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.comment-author{
+  font-family:'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--amber);
+}
+.comment-actions button{
+  background: none;
+  border: none;
+  color: var(--gray);
+  font-size: 11px;
+  cursor: pointer;
+  margin-left: 8px;
+  text-decoration: underline;
+}
+.comment-content{
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}

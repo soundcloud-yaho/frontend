@@ -2,7 +2,7 @@
 // main.js - 앱 초기화 및 상태 관리
 // ============================================================
 
-const POLL_INTERVAL_MS = 30000; // 30초마다 현재 조건으로 재조회
+const POLL_INTERVAL_MS = 30000;
 
 const state = {
   dates: [],
@@ -10,6 +10,7 @@ const state = {
   selectedDate: null,
   selectedTeam: "",
   countByDate: {},
+  currentMatches: [],
 };
 
 const el = {
@@ -19,10 +20,15 @@ const el = {
   matchList: document.getElementById("matchList"),
   clock: document.getElementById("clock"),
   themeToggle: document.getElementById("themeToggle"),
+  authArea: document.getElementById("authArea"),
   modalOverlay: document.getElementById("modalOverlay"),
   modalPanel: document.getElementById("modalPanel"),
   modalClose: document.getElementById("modalClose"),
 };
+
+function onAuthChanged() {
+  renderMatches(el.matchList, state.currentMatches);
+}
 
 async function loadMeta() {
   const meta = await fetchMeta();
@@ -30,7 +36,6 @@ async function loadMeta() {
   state.teams = meta.teams;
   state.selectedDate = meta.dates[0];
 
-  // 날짜별 경기 수 계산 (탭에 표시)
   const all = await fetchMatches({});
   state.countByDate = {};
   all.forEach(m => {
@@ -44,6 +49,7 @@ async function refreshMatches() {
       date: state.selectedDate,
       team: state.selectedTeam || undefined,
     });
+    state.currentMatches = matches;
     renderMatches(el.matchList, matches);
   } catch (err) {
     el.matchList.innerHTML = `
@@ -89,6 +95,10 @@ function bindEvents() {
     }
   });
 
+  bindFavoriteStarClicks(el.matchList, () => renderMatches(el.matchList, state.currentMatches));
+  bindPredictionClicks(el.modalPanel);
+  bindCommentEvents(el.modalPanel);
+
   el.modalClose.addEventListener("click", () => closeMatchModal(el.modalOverlay));
   el.modalOverlay.addEventListener("click", (e) => {
     if (e.target === el.modalOverlay) closeMatchModal(el.modalOverlay);
@@ -103,12 +113,16 @@ async function init() {
   renderClock(el.clock);
   setInterval(() => renderClock(el.clock), 1000);
 
+  await initAuthState();
+  renderAuthArea(el.authArea);
+  await initFavoritesState();
+  await initPredictionsState();
+
   await loadMeta();
   renderTabsAndFilter();
   bindEvents();
   await refreshMatches();
 
-  // 실시간(폴링) 갱신 - 현재 선택된 date/team 기준으로 주기적 재조회
   setInterval(refreshMatches, POLL_INTERVAL_MS);
 }
 

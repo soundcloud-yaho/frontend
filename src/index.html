@@ -7,7 +7,6 @@
 <title>월드컵 실시간 일정 &amp; 결과</title>
 <link rel="stylesheet" href="./css/style.css">
 <script>
-  // 깜빡임 방지: CSS 로드 전에 저장된 테마를 먼저 적용
   (function(){
     var saved = localStorage.getItem("wc-theme");
     if (saved === "light") {
@@ -28,6 +27,7 @@
         </div>
       </div>
       <div class="header-right">
+        <div id="authArea"></div>
         <button class="theme-toggle" id="themeToggle" aria-label="테마 전환">🌙 다크</button>
         <div class="clock" id="clock">--:--:--</div>
       </div>
@@ -54,6 +54,15 @@
   <script src="./js/config.js"></script>
   <script src="./js/flag-utils.js"></script>
   <script src="./js/api.js"></script>
+  <script src="./js/api/client.js"></script>
+  <script src="./js/api/auth.js"></script>
+  <script src="./js/api/favorites.js"></script>
+  <script src="./js/api/predictions.js"></script>
+  <script src="./js/api/comments.js"></script>
+  <script src="./js/auth-ui.js"></script>
+  <script src="./js/favorites-ui.js"></script>
+  <script src="./js/predictions-ui.js"></script>
+  <script src="./js/comments-ui.js"></script>
   <script src="./js/render.js"></script>
   <script src="./js/main.js"></script>
 </body>
