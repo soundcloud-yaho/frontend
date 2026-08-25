@@ -1,19 +1,25 @@
 // ============================================================
 // config.js - 환경별 설정
-// 로컬 개발 / 배포(S3+CloudFront) 환경에 따라 API 주소를 다르게 지정합니다.
-// 배포 시에는 아래 PROD_BASE_URL 값만 실제 백엔드 주소로 바꿔주세요.
-// (예: ALB DNS 주소, 또는 커스텀 도메인을 붙였다면 그 도메인)
-// 반드시 https:// 로 시작해야 합니다. (CloudFront가 https이므로
-// http 백엔드를 부르면 브라우저가 Mixed Content로 차단합니다)
 // ============================================================
 
-const LOCAL_BASE_URL = "http://127.0.0.1:8000";
-const PROD_BASE_URL = "https://api.rubao.store";
+const LOCAL_MATCHES_URL = "http://127.0.0.1:8000";
+const PROD_MATCHES_URL = "https://api.rubao.store";
 
-// 로컬(localhost/127.0.0.1)에서 열었으면 로컬 백엔드를, 그 외(CloudFront 등)에서 열었으면 배포 백엔드를 자동으로 사용
+const LOCAL_AUTH_URL = "http://127.0.0.1:8001";
+const PROD_AUTH_URL = "https://auth-api.rubao.store";
+
+const LOCAL_COMMENTS_URL = "http://127.0.0.1:8002";
+const PROD_COMMENTS_URL = "https://comment-api.rubao.store";
+
+const LOCAL_PREDICTIONS_URL = "http://127.0.0.1:8003";
+const PROD_PREDICTIONS_URL = "https://predictions-api.rubao.store";
+
+const isLocal =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1";
+
 const CONFIG = {
-  BASE_URL:
-    location.hostname === "localhost" || location.hostname === "127.0.0.1"
-      ? LOCAL_BASE_URL
-      : PROD_BASE_URL, 
+  MATCHES_BASE_URL: isLocal ? LOCAL_MATCHES_URL : PROD_MATCHES_URL,
+  AUTH_BASE_URL: isLocal ? LOCAL_AUTH_URL : PROD_AUTH_URL,
+  COMMENTS_BASE_URL: isLocal ? LOCAL_COMMENTS_URL : PROD_COMMENTS_URL,
+  PREDICTIONS_BASE_URL: isLocal ? LOCAL_PREDICTIONS_URL : PROD_PREDICTIONS_URL,
 };

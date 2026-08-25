@@ -52,30 +52,31 @@ function renderTeamFilter(select, teams, selectedTeam) {
 function matchCardHTML(m) {
   const home = m.home_team;
   const away = m.away_team;
-  const isLive = m.status === "live";
   const isScheduled = m.status === "scheduled";
-  const clickable = m.status !== "scheduled";
+  const clickable = true; // 예정/진행/종료 모든 경기가 상세(예측 또는 스탯+댓글) 클릭 가능
 
   const scoreHTML = isScheduled
     ? `<span class="time">${m.kickoff_time}</span>`
     : `${home.score} <span class="dash">-</span> ${away.score}`;
 
   return `
-    <div class="match-card${clickable ? " clickable" : ""}" data-id="${m.id}">
+    <div class="match-card clickable" data-id="${m.id}">
       <div class="teams">
         <div class="team home">
           ${crestImg(home)}
           <span class="team-name">${home.name}</span>
+          ${favoriteStarHTML(home.id)}
         </div>
         <div class="score-box">${scoreHTML}</div>
         <div class="team away">
-          ${crestImg(away)}
+          ${favoriteStarHTML(away.id)}
           <span class="team-name">${away.name}</span>
+          ${crestImg(away)}
         </div>
       </div>
       <div class="meta-col">
         <span class="status-badge ${m.status}">${STATUS_LABEL[m.status]}</span>
-        ${clickable ? '<span class="detail-hint">스탯 보기 ›</span>' : ''}
+        <span class="detail-hint">${isScheduled ? "예측 · 댓글 ›" : "스탯 · 댓글 ›"}</span>
       </div>
     </div>
   `;
@@ -93,7 +94,6 @@ function renderMatches(container, matches) {
     return;
   }
 
-  // 라운드별로 그룹핑
   const byRound = new Map();
   matches.forEach(m => {
     if (!byRound.has(m.round)) byRound.set(m.round, []);
@@ -114,7 +114,7 @@ function renderClock(el) {
 }
 
 // ------------------------------------------------------------
-// 경기 상세 스탯 모달
+// 경기 상세 모달 (스탯 + 승부예측 + 댓글)
 // ------------------------------------------------------------
 
 const STAT_LABELS = {
@@ -154,7 +154,7 @@ function matchDetailHTML(m) {
 
   let statsHTML;
   if (!m.stats) {
-    statsHTML = `<div class="no-stats">스탯 정보가 제공되지 않는 경기입니다</div>`;
+    statsHTML = `<div class="no-stats">스탯 정보는 제공되지 않습니다</div>`;
   } else {
     const s = m.stats;
     statsHTML = `
@@ -170,7 +170,7 @@ function matchDetailHTML(m) {
     <div class="modal-header">
       <div class="modal-team">
         ${crestImg(home)}
-        <span>${home.name}</span>
+        <span>${home.name} ${favoriteStarHTML(home.id)}</span>
       </div>
       <div class="modal-score">
         <span class="status-badge ${m.status}">${STATUS_LABEL[m.status]}</span>
@@ -178,11 +178,13 @@ function matchDetailHTML(m) {
       </div>
       <div class="modal-team away">
         ${crestImg(away)}
-        <span>${away.name}</span>
+        <span>${away.name} ${favoriteStarHTML(away.id)}</span>
       </div>
     </div>
     <div class="modal-body">
+      ${predictionSectionHTML(m)}
       ${statsHTML}
+      ${commentSectionHTML()}
     </div>
   `;
 }
@@ -191,11 +193,14 @@ function openMatchModal(overlayEl, panelEl, match) {
   panelEl.innerHTML = matchDetailHTML(match);
   overlayEl.classList.add("open");
   document.body.style.overflow = "hidden";
+  loadPredictionSummary(match.id);
+  startComments(match.id); // 댓글 로드 + 폴링 시작
 }
 
 function closeMatchModal(overlayEl) {
   overlayEl.classList.remove("open");
   document.body.style.overflow = "";
+  stopComments(); // 모달 닫으면 댓글 폴링 반드시 정지
 }
 
 function initThemeToggle(button) {
