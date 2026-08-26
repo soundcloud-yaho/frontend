@@ -10,13 +10,15 @@ const state = {
   selectedDate: null,
   selectedTeam: "",
   countByDate: {},
-  currentMatches: [],
+  currentMatches: [],   // fetchMatches로 받은 원본 목록 (즐겨찾기 필터 적용 전)
+  favoritesOnly: false, // "즐겨찾기만 보기" 토글 상태
 };
 
 const el = {
   dateTabs: document.getElementById("dateTabs"),
   teamFilter: document.getElementById("teamFilter"),
   clearFilter: document.getElementById("clearFilter"),
+  favFilterToggle: document.getElementById("favFilterToggle"),
   matchList: document.getElementById("matchList"),
   clock: document.getElementById("clock"),
   themeToggle: document.getElementById("themeToggle"),
@@ -26,8 +28,30 @@ const el = {
   modalClose: document.getElementById("modalClose"),
 };
 
+/**
+ * 화면에 실제로 그릴 목록을 계산.
+ * favoritesOnly가 켜져 있으면 즐겨찾기한 팀이 home/away 중 하나라도 걸린 경기만 남김.
+ */
+function getVisibleMatches() {
+  if (!state.favoritesOnly) return state.currentMatches;
+  return state.currentMatches.filter(
+    (m) =>
+      favoritesState.teamIds.has(m.home_team.id) ||
+      favoritesState.teamIds.has(m.away_team.id)
+  );
+}
+
+function renderVisibleMatches() {
+  renderMatches(el.matchList, getVisibleMatches());
+}
+
+// 로그인/로그아웃으로 즐겨찾기 상태가 바뀌었을 때 화면 갱신
 function onAuthChanged() {
-  renderMatches(el.matchList, state.currentMatches);
+  renderVisibleMatches();
+}
+
+function renderFavFilterButton() {
+  el.favFilterToggle.classList.toggle("active", state.favoritesOnly);
 }
 
 async function loadMeta() {
@@ -50,7 +74,7 @@ async function refreshMatches() {
       team: state.selectedTeam || undefined,
     });
     state.currentMatches = matches;
-    renderMatches(el.matchList, matches);
+    renderVisibleMatches();
   } catch (err) {
     el.matchList.innerHTML = `
       <div class="empty-state">
@@ -69,6 +93,7 @@ function renderTabsAndFilter() {
     refreshMatches();
   });
   renderTeamFilter(el.teamFilter, state.teams, state.selectedTeam);
+  renderFavFilterButton();
 }
 
 function bindEvents() {
@@ -83,6 +108,17 @@ function bindEvents() {
     refreshMatches();
   });
 
+  el.favFilterToggle.addEventListener("click", () => {
+    // 로그인 안 했으면 즐겨찾기 자체가 없으니 로그인 유도
+    if (!authState.user) {
+      openAuthModal(el.authArea);
+      return;
+    }
+    state.favoritesOnly = !state.favoritesOnly;
+    renderFavFilterButton();
+    renderVisibleMatches();
+  });
+
   el.matchList.addEventListener("click", async (e) => {
     const card = e.target.closest(".match-card.clickable");
     if (!card) return;
@@ -95,7 +131,8 @@ function bindEvents() {
     }
   });
 
-  bindFavoriteStarClicks(el.matchList, () => renderMatches(el.matchList, state.currentMatches));
+  // 별 클릭 시 목록에도 즐겨찾기 필터가 걸려있을 수 있으니 renderVisibleMatches로 다시 그림
+  bindFavoriteStarClicks(el.matchList, renderVisibleMatches);
   bindPredictionClicks(el.modalPanel);
   bindCommentEvents(el.modalPanel);
 
