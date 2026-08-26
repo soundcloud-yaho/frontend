@@ -616,3 +616,24 @@ header{
   line-height: 1.5;
   word-break: break-word;
 }
+/* ------------------------------------------------------------
+   즐겨찾기 필터 토글 버튼 (기존 style.css 맨 아래에 추가)
+------------------------------------------------------------ */
+.fav-filter-toggle{
+  background: rgba(245,245,240,0.04);
+  border: 1px solid var(--line);
+  color: var(--chalk);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: auto; /* filter-row 안에서 우측 정렬 */
+}
+.fav-filter-toggle:hover{ border-color: rgba(245,245,240,0.3); }
+.fav-filter-toggle.active{
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--night);
+  font-weight: 600;
+}
